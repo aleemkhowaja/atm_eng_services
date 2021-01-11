@@ -18,7 +18,6 @@ import com.path.atm.engine.util.AtmEngineConstants;
 import com.path.atm.engine.util.EngineError;
 import com.path.atm.vo.engine.AtmIsoFieldCO;
 import com.path.bo.common.ConstantsCommon;
-import com.path.lib.common.util.NumberUtil;
 import com.path.lib.common.util.StringUtil;
 import com.solab.iso8583.IsoMessage;
 import com.solab.iso8583.IsoType;
@@ -329,7 +328,7 @@ public class AtmIsoMessage extends IsoMessage implements Serializable
      */
     public String returnTerminalCode()
     {
-	return StringUtil.nullToEmpty(returnFieldValueStr(IsoDefinitionConstants.BIT_TERMINAL_ID));
+	return returnFieldValueStr(IsoDefinitionConstants.BIT_TERMINAL_ID);
     }
     
 
