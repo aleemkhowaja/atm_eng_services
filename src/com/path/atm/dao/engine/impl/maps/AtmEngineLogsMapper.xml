@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="atmEngineLogsMapper">
+
+	<select id="returnEngInterface" resultType="com.path.dbmaps.vo.ATM_ENG_INTERFACEVO"
+		parameterType="com.path.dbmaps.vo.ATM_ENG_INTERFACEVO">
+		SELECT <include refid="ATM_ENG_INTERFACE.Base_Column_List" />
+		FROM ATM_ENG_INTERFACE
+		WHERE INTERFACE_ID = #{INTERFACE_ID}
+	</select>
+	
+	<update id="updateEngInterface" parameterType="com.path.dbmaps.vo.ATM_ENG_INTERFACEVO" >
+		update ATM_ENG_INTERFACE
+	    <set >
+	      <if test="INTERFACE_ID != null" >
+	        <choose >
+	          <when test="INTERFACE_ID == emptyBigDecimalValue" >
+	            INTERFACE_ID = NULL ,
+	          </when>
+	          <otherwise >
+	            INTERFACE_ID = #{INTERFACE_ID},
+	          </otherwise>
+	        </choose>
+	      </if>
+	      <if test="START_TIME != null" >
+	        START_TIME = #{START_TIME},
+	      </if>
+	      <if test="STATUS != null" >
+	        <choose >
+	          <when test="STATUS.equals(&quot;&quot;)" >
+	            STATUS = NULL ,
+	          </when>
+	          <otherwise >
+	            STATUS = #{STATUS},
+	          </otherwise>
+	        </choose>
+	      </if>
+	      <if test="MESSAGE != null" >
+	        <choose >
+	          <when test="MESSAGE.equals(&quot;&quot;)" >
+	            MESSAGE = NULL ,
+	          </when>
+	          <otherwise >
+	            MESSAGE = #{MESSAGE},
+	          </otherwise>
+	        </choose>
+	      </if>
+	      <if test="MACHINE_NAME_IP != null" >
+	        <choose >
+	          <when test="MACHINE_NAME_IP.equals(&quot;&quot;)" >
+	            MACHINE_NAME_IP = NULL ,
+	          </when>
+	          <otherwise >
+	            MACHINE_NAME_IP = #{MACHINE_NAME_IP},
+	          </otherwise>
+	        </choose>
+	      </if>
+	      <if test="ISO_FIELDS_CONFIG != null" >
+	        ISO_FIELDS_CONFIG = #{ISO_FIELDS_CONFIG},
+	      </if>
+	    </set>
+		<where>
+			<if test="INTERFACE_ID != null">
+				INTERFACE_ID = #{INTERFACE_ID}
+			</if>
+		</where>
+		
+	</update>
+	
+	<insert id="insertReactorInstance" parameterType="com.path.dbmaps.vo.ATM_ENG_INTERFACEVO">
+			<selectKey resultType="java.math.BigDecimal" keyProperty="ATM_ENG_INTERFACE_ID" order="BEFORE" >
+				<if test="isOracle == 1">
+					SELECT ATM_ENG_INTERFACE_SEQ.NEXTVAL FROM dual
+				</if>
+				<if test="isSybase == 1 and isSQLServer != 1 " >
+					SELECT next_identity('ATM_ENG_INTERFACE')
+				</if>
+				<if test="isSQLServer == 1 " >
+					SELECT IDENT_CURRENT ('ATM_ENG_INTERFACE') + 1
+				</if>
+			</selectKey>
+		 <choose>
+ 			<when test="isSybase == 1">
+ 				IF NOT EXISTS (SELECT 1 FROM ATM_ENG_INTERFACE WHERE INTERFACE_ID = #{INTERFACE_ID})
+					BEGIN
+					   INSERT INTO ATM_ENG_INTERFACE(INTERFACE_ID,STATUS)
+					    values (#{INTERFACE_ID}, 'D')
+					END
+			</when>
+			<when test="isOracle == 1">
+			   DECLARE
+				   CNT number;
+				BEGIN
+				    CNT := 0;
+				Select COUNT(1) INTO CNT FROM ATM_ENG_INTERFACE WHERE INTERFACE_ID = #{INTERFACE_ID} ;
+				    IF CNT = 0 THEN
+				    INSERT INTO ATM_ENG_INTERFACE
+				          (ATM_ENG_INTERFACE_ID, INTERFACE_ID, STATUS)
+				          VALUES(#{ATM_ENG_INTERFACE_ID}, #{INTERFACE_ID}, 'D');
+				  END IF;
+				END;
+			</when>
+			<otherwise>
+				INSERT INTO ATM_ENG_INTERFACE(INTERFACE_ID,STATUS)
+				SELECT #{INTERFACE_ID},'D'
+				FROM ATM_ENG_INTERFACE
+				WHERE NOT EXISTS (SELECT 1 FROM ATM_ENG_INTERFACE WHERE INTERFACE_ID = #{INTERFACE_ID} )
+			
+			</otherwise>
+		</choose>
+	</insert>
+
+	<!-- Insert ATM Engine Action Logs  -->
+	<insert id="logEngAction" parameterType="atmEngActionLog">
+		<selectKey resultType="java.math.BigDecimal"
+			keyProperty="ATM_ENG_ACTION_LOG_ID" order="BEFORE">
+			<if test="isOracle == 1">
+				SELECT ATM_ENG_ACTION_LOG_SEQ.NEXTVAL FROM dual
+			</if>
+			<if test="isSybase == 1 and isSQLServer != 1 ">
+				SELECT next_identity('ATM_ENG_ACTION_LOG')
+			</if>
+			<if test="isSQLServer == 1 ">
+				SELECT IDENT_CURRENT ('ATM_ENG_ACTION_LOG') + 1
+			</if>
+		</selectKey>
+		
+		 insert into ATM_ENG_ACTION_LOG
+		    <trim prefix="(" suffix=")" suffixOverrides="," >
+		    	<if test="isOracle == 1">
+		      		ATM_ENG_ACTION_LOG_ID,
+		      	</if>
+		      	<if test="INTERFACE_CODE != null and INTERFACE_CODE != emptyBigDecimalValue" >
+		        	INTERFACE_CODE,
+		      	</if>
+		      	<if test="ATM_ENG_ACTION != null and !&quot;&quot;.equals(ATM_ENG_ACTION)" >
+		        	ATM_ENG_ACTION,
+		      	</if>
+		      	<if test="START_TIME != null" >
+		        	START_TIME,
+		      	</if>
+		      	<if test="END_TIME != null" >
+		        	END_TIME,
+		      	</if>
+		      	<if test="MESSAGE != null and !&quot;&quot;.equals(MESSAGE)" >
+		        	MESSAGE,
+		      	</if>
+		    </trim>
+		    <trim prefix="values (" suffix=")" suffixOverrides="," >
+		    	<if test="isOracle == 1">
+		    		#{ATM_ENG_ACTION_LOG_ID},
+		    	</if>
+		      	<if test="INTERFACE_CODE != null and INTERFACE_CODE != emptyBigDecimalValue" >
+		        	#{INTERFACE_CODE},
+		      	</if>
+		      	<if test="ATM_ENG_ACTION != null and !&quot;&quot;.equals(ATM_ENG_ACTION)" >
+		       		#{ATM_ENG_ACTION},
+		      	</if>
+		      	<if test="START_TIME != null" >
+		       		#{START_TIME},
+		      	</if>
+		      	<if test="END_TIME != null" >
+		        	#{END_TIME},
+		      	</if>
+		      	<if test="MESSAGE != null and !&quot;&quot;.equals(MESSAGE)" >
+		        	#{MESSAGE},
+		      	</if>
+		    </trim>
+	</insert>
+	
+</mapper>

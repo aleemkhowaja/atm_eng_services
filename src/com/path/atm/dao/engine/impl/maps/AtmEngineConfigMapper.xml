@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="atmEngineConfigMapper">
+
+	<resultMap id="returnChannelConfigMap" type="atmChannelConfig">
+		<!-- Channel Main info -->
+		<result column="CHANNEL_ID" property="channelId" />
+		<result column="DESCRIPTION" property="description" />
+		<result column="COMMUNICATION_PROTOCOL" property="communicationType" />
+		<result column="SERVER_TYPE" property="serverType" />
+		<result column="IP_ADDRESS" property="ip" />
+		<result column="PORT" property="port" />
+		<result column="INTERFACE_CODE" property="interfaceCode" />
+		<result column="SOCKET_RESTART_INTERVAL" property="socketRestartInterval" />
+		
+		<!-- Channel Parameters -->
+		<result column="GTW_CHANNEL_PARAMS_ID" property="channelParamId" />
+		<result column="ENGN_ACCEPTOR_WORKER_NO" property="acceptorWorkerNo" />
+		<result column="ENGN_WORKER_NO" property="connectorWorkerNo" />
+		<result column="ENGN_ADD_LOGGING_HANDLER_YN" property="addLoggingHandlerYN" />
+		<result column="ENGN_ADD_ECHO_MSG_LISTENER_YN" property="addEchoMessageListenerYN" />
+		<result column="ENGN_LOG_FIELD_DESCRIPTION_YN" property="logFieldDescriptionYN" />
+		<result column="ENGN_LOG_SENSITIVE_DATA_YN" property="logSensitiveDataYN" />
+		<result column="ENGN_REPLY_ON_ERROR_YN" property="replyOnErrorYN" />
+		<result column="ENGN_IDLE_TIMEOUT" property="idleTimeOut" />
+		<result column="ENGN_CHARSET" property="connectorCharSet" />
+		<result column="TASK_CONTAINER_CONSUMER_NO" property="taskContainerConsumerNo" />
+		<result column="TASK_CONTAINER_SESSION_NO" property="taskContainerSessionNo" />
+		<result column="TASK_CONTAINER_DESTINATION" property="taskContainerDestination" />
+	</resultMap>
+	
+	
+	<select id="returnChannelConfig" parameterType="interfaceConfSc" resultMap="returnChannelConfigMap">
+		SELECT chnl.CHANNEL_ID,
+	      chnl.DESCRIPTION,
+	      chnl.COMMUNICATION_PROTOCOL,
+	      chnl.SERVER_TYPE,
+	      chnl.IP_ADDRESS,
+	      chnl.PORT,
+	      chnl.INTERFACE_CODE,
+	      chnl.SOCKET_RESTART_INTERVAL,
+
+	      chnlParms.GTW_CHANNEL_PARAMS_ID,
+	      chnlParms.ENGN_ACCEPTOR_WORKER_NO,
+	      chnlParms.ENGN_WORKER_NO,
+	      chnlParms.ENGN_ADD_LOGGING_HANDLER_YN,
+	      chnlParms.ENGN_ADD_ECHO_MSG_LISTENER_YN,
+	      chnlParms.ENGN_LOG_FIELD_DESCRIPTION_YN,
+	      chnlParms.ENGN_LOG_SENSITIVE_DATA_YN,
+	      chnlParms.ENGN_REPLY_ON_ERROR_YN,
+	      chnlParms.ENGN_IDLE_TIMEOUT,
+	      chnlParms.ENGN_CHARSET,
+	      chnlParms.TASK_CONTAINER_CONSUMER_NO ,
+	      chnlParms.TASK_CONTAINER_SESSION_NO,
+	      chnlParms.TASK_CONTAINER_DESTINATION
+	      
+				      
+	      FROM GTW_CHANNEL chnl
+	      LEFT JOIN GTW_CHANNEL_ISO_INT_PARAMS chnlParms
+	      	ON chnl.CHANNEL_ID = chnlParms.CHANNEL_ID
+	      WHERE chnl.INTERFACE_CODE=#{code}
+	</select>
+	
+	<!--  @todo we should add a new column "authcode" to the response  -->
+	<select id="returnLastAuthenticationId" parameterType="interfaceConfSc" resultType="long">
+		SELECT <choose><when test="isSybase == 1" >ISNULL</when><otherwise>NVL</otherwise></choose>
+			(MAX(MESSAGE_ID)+1,1) FROM ATM_ENG_INCOMING_REQUEST
+		WHERE INTERFACE_ID = #{code} AND
+			<if test="isSybase == 1" >
+				CONVERT(DATE,RECEIVE_TIME,103)
+			</if>
+			<if test="isOracle == 1" >
+			  TO_DATE(TO_CHAR(RECEIVE_TIME, 'dd/MM/yyyy'),'dd/MM/yyyy' )
+       		</if>
+       		 = <include refid="commonLibMapper.systemDate"/>
+	</select>
+	
+	<select id="returnNextMessageId" parameterType="interfaceConfSc" resultType="long">
+		SELECT <choose><when test="isSybase == 1" >ISNULL</when><otherwise>NVL</otherwise></choose>
+			(MAX(MESSAGE_ID)+1,1) FROM ATM_ENG_INCOMING_REQUEST
+		WHERE INTERFACE_ID = #{code}
+	</select>
+	
+	<resultMap id="returnIsoFieldsDefByIntMap" type="atmIsoFieldCO">
+	
+		<result column="INTERFACE_CODE" property="interfaceCode" />
+		<result column="FIELD_CODE" property="code" />
+		<result column="FIELD_NAME" property="name" />
+		<result column="FIELD_TYPE" property="type" />
+		<result column="FIXED_LENGTH" property="fixedLength" />
+		<result column="DYNAMIC_LENGTH" property="dynamicLength" />
+		<result column="TOTAL_MASK_YN" property="totalMask" />
+		<result column="PARTIAL_MASK" property="partialMask" />
+		<result column="IS_DECIMAL_YN" property="isDecimal" />
+		<result column="EXPRESSION" property="expression" />
+		
+		<collection property="isoFieldSubList" ofType="atmIsoFieldCO" notNullColumn="SUB_FIELD_CODE">
+			<result column="IDX" property="index" />
+			<result column="INTERFACE_CODE" property="interfaceCode" />
+			<result column="FIELD_CODE" property="fieldCode" />
+			<result column="SUB_FIELD_CODE" property="code" />
+			<result column="SUB_FIELD_NAME" property="name" />
+			<result column="SUB_FIELD_TYPE" property="type" />
+			<result column="SUB_FLENGTH" property="fixedLength" />
+			<result column="SUB_DLENGTH" property="dynamicLength" />
+			<result column="SUB_EXP" property="expression" />
+		</collection>
+		
+	</resultMap>
+
+	<resultMap id="returnInterfaceInfoMap" type="atmInterfaceCO">
+		<result column="INTERFACE_CODE" property="code" />
+		<result column="COMP_CODE" property="compCode" />
+		<result column="DESCRIPTION" property="description" />
+		<result column="INTERFACE_TYPE" property="type" />
+		<result column="INCLUDE_LENGTH" property="includeLength" />
+		<result column="MSG_LENGTH" property="msgLength" />
+		<result column="PROTOCOL_IDENTITFICATION" property="protocolIdentification" />
+		<result column="HEADER_LENGTH" property="headerLength" />
+		<result column="HEADER_DATA" property="headerData" />
+		<result column="BITMAP_TYPE" property="bitmapType" />
+		<result column="LENGTH_TYPE" property="lengthType" />
+		<result column="INCLUDE_HEADER_YN" property="includeHeader" />
+		<result column="POS_IN_HEADER_YN" property="posInHeader" />
+		<result column="ISO_PRESENT_YN" property="isoPresent" />
+		<result column="SKIP_BITMAP_YN" property="skipBitmap" />
+		<result column="STATUS" property="status" />
+		
+	</resultMap>
+	
+	
+	<select id="returnInterfaceInfo" parameterType="interfaceConfSc"
+		resultMap="returnInterfaceInfoMap" >
+		
+		SELECT ATMINT.INTERFACE_CODE,ATMINT.COMP_CODE,ATMINT.DESCRIPTION,
+	       ATMINT.INTERFACE_TYPE,ATMINT.INCLUDE_LENGTH,ATMINT.MSG_LENGTH,
+	       ATMINT.PROTOCOL_IDENTITFICATION,ATMINT.HEADER_LENGTH,ATMINT.HEADER_DATA,
+	       ATMINT.BITMAP_TYPE,ATMINT.LENGTH_TYPE,ATMINT.INCLUDE_HEADER_YN,
+	       ATMINT.POS_IN_HEADER_YN,ATMINT.ISO_PRESENT_YN,ATMINT.SKIP_BITMAP_YN,
+	       ATMINT.STATUS
+		FROM GTW_ATM_INTERFACES ATMINT
+		WHERE ATMINT.INTERFACE_CODE = #{code}
+	</select>
+
+
+	<resultMap id="returnIsoMessagesMap" type="atmIsoMsgCO">
+		<id column="ATM_ISO_MSGS_CODE" property="code" />
+		<result column="REQUEST_MTI" property="requestMti" />
+		<result column="REQUEST_BITMAP1" property="reqPrimaryBitMap" />
+		<result column="REQUEST_BITMAP2" property="reqSecondaryBitMap" />
+		<result column="RESPONSE_MTI" property="responseMti" />
+		<result column="RESPONSE_BITMAP1" property="respPrimaryBitMap" />
+		<result column="RESPONSE_BITMAP2" property="respSecondaryBitMap" />
+		<result column="RESPONSE_EXPRESSION" property="respExpression" />
+	</resultMap>
+	
+	
+	<select id="returnIsoMessages" parameterType="interfaceConfSc"
+		resultMap="returnIsoMessagesMap" >
+		
+		SELECT IM.INTERFACE_CODE,IM.ATM_ISO_MSGS_CODE,IM.REQUEST_MTI,IM.REQUEST_BITMAP1,
+	       IM.REQUEST_BITMAP2,IM.RESPONSE_MTI,IM.RESPONSE_BITMAP1,IM.RESPONSE_BITMAP2
+		FROM GTW_ATM_INT_ISO_MSGS IM 
+		WHERE IM.INTERFACE_CODE = #{code}
+	</select>
+	
+	<resultMap id="returnIsoMsgDefListMap" type="atmIsoMsgDefCO">
+		<id property="id" column="ISO_MSG_DEF_ID" />
+		<result property="description" column="DESCRIPTION" />
+		<result property="interfaceCode" column="INTERFACE_CODE" />
+		<result property="networkMessageCodeYN" column="NETWORK_MESSAGE_YN" />
+		<result property="networkMessageType" column="NETWORK_MESSAGE_TYPE" />
+		<result property="atmIsoMsgCode" column="ATM_ISO_MSGS_CODE" />
+		<result property="reqMTI" column="reqMTI" />
+		<result property="processCode" column="PROCESS_CODE" />
+		<result property="criteriaExpression" column="ADD_CRITERIA_EXPRESSION" />
+		<result property="mappingId" column="MAPPING_ID" />
+	</resultMap>
+
+	<select id="returnIsoMsgDefList" resultMap="returnIsoMsgDefListMap" 
+		parameterType="interfaceConfSc">
+	       SELECT ISODEF.ISO_MSG_DEF_ID,ISODEF.DESCRIPTION,ISODEF.INTERFACE_CODE,
+	       ISODEF.NETWORK_MESSAGE_YN,ISODEF.NETWORK_MESSAGE_TYPE,
+		   ISODEF.ATM_ISO_MSGS_CODE, ISODEF.ATM_ISO_MSGS_CODE,
+		   ISODEF.PROCESS_CODE,ISODEF.ADD_CRITERIA_EXPRESSION,ISODEF.MAPPING_ID,
+		   (SELECT REQUEST_MTI from GTW_ATM_INT_ISO_MSGS isoMsg 
+		   	where isoMsg.ATM_ISO_MSGS_CODE= ISODEF.ATM_ISO_MSGS_CODE) as reqMTI
+		   FROM GTW_ATM_ISO_MSG_DEF ISODEF
+		   WHERE ISODEF.INTERFACE_CODE = #{code} 
+	</select>
+	
+	
+	<!-- Result map of ISO Message Definition Network Request and Response Fields -->
+	<resultMap id="atmNetMsgFldsListMap" 			type="atmIsoNetMsgFldsCO">
+		<result property="netMsgFldId" 				column="NET_MSG_FLD_ID" />
+		<result property="isoMsgDefId" 				column="ISO_MSG_DEF_ID" />
+		<result property="fieldCode"  				column="FIELD_CODE" />
+		<result property="requestFieldYN" 			column="REQUEST_FIELD_YN" />
+		<result property="expression" 				column="EXPRESSION" />
+	</resultMap>
+	
+	<!-- Select of ISO Message Definition Network Request and Response Fields List-->
+	<select id="returnAtmNetMsgFldsList" parameterType="interfaceConfSc" resultMap="atmNetMsgFldsListMap">
+		<include refid="queryAtmNetMsgFldsSQL" />
+	</select>
+	
+	<!-- SQL of ISO Message Definition Network Request and Response Fields-->
+	<sql id="queryAtmNetMsgFldsSQL">
+		SELECT
+			netMsgFlds.NET_MSG_FLD_ID,
+			netMsgFlds.ISO_MSG_DEF_ID,
+			netMsgFlds.FIELD_CODE,
+			netMsgFlds.REQUEST_FIELD_YN,
+			netMsgFlds.EXPRESSION
+		FROM
+		GTW_ATM_ISO_NET_MSG_FLDS netMsgFlds
+			LEFT OUTER JOIN GTW_ATM_ISO_MSG_DEF isoMsgDef ON isoMsgDef.ISO_MSG_DEF_ID=netMsgFlds.ISO_MSG_DEF_ID
+			WHERE isoMsgDef.INTERFACE_CODE=#{code}
+	</sql>
+	
+	<!--  @todo we may need to sort by field code, index sub code since we may
+	have an issue related to subfield parsing when order is wrong 3.1 3.2 3.3 010000 -->
+	<select id="returnIsoFieldsDefByInt" parameterType="interfaceConfSc"
+		resultMap="returnIsoFieldsDefByIntMap" >
+		SELECT ISOFIELD.INTERFACE_CODE, ISOFIELD.FIELD_CODE, ISOFIELD.FIELD_NAME, ISOFIELD.FIELD_TYPE,
+			ISOFIELD.FIXED_LENGTH, ISOFIELD.DYNAMIC_LENGTH, ISOFIELD.TOTAL_MASK_YN, ISOFIELD.PARTIAL_MASK,
+			ISOFIELD.IS_DECIMAL_YN, ISOFIELD.EXPRESSION,
+			
+			ISOSUBFIELD.ATM_ISO_SUB_FLDS_CODE IDX , ISOSUBFIELD.INTERFACE_CODE , ISOSUBFIELD.SUB_FIELD_CODE, 
+			ISOSUBFIELD.SUB_FIELD_NAME, ISOSUBFIELD.SUB_FIELD_TYPE, ISOSUBFIELD.FIXED_LENGTH SUB_FLENGTH,
+			ISOSUBFIELD.DYNAMIC_LENGTH SUB_DLENGTH, ISOSUBFIELD.EXPRESSION SUB_EXP
+			
+		FROM GTW_ATM_INT_ISO_FLDS ISOFIELD
+		LEFT JOIN GTW_ATM_INT_ISO_SUB_FLDS ISOSUBFIELD
+			ON ISOFIELD.ATM_ISO_FLDS_CODE =  ISOSUBFIELD.ATM_ISO_FLDS_CODE
+		WHERE ISOFIELD.INTERFACE_CODE = #{code}
+		ORDER BY FIELD_CODE,IDX ASC
+	</select>
+	
+	
+	<resultMap id="returnAcquirerListMap" type="acquirerCO">
+		<result column="ACQUIRER_ID" property="id" />
+		<result column="COMP_CODE" property="compCode" />
+		<result column="DESCRIPTION" property="description" />
+		<result column="ACQUIRER_MSG_SOURCE" property="msgSource" />
+		<result column="BANK_ATM_YN" property="bankAtmYN" />
+		<result column="TRANSACTION_BRANCH_CODE" property="trxBranchCode" />
+		<result column="TELLER_CODE" property="tellerCode" />
+		<result column="TELLER_USER_ID" property="tellerUserId" />
+		<result column="INTERFACE_CODE" property="interfaceCode" />
+	</resultMap>
+	
+	<select id="returnAcquirerList" parameterType="acquirerSC" resultMap="returnAcquirerListMap">
+		SELECT ACQUIRER_ID, COMP_CODE, DESCRIPTION, ACQUIRER_MSG_SOURCE, BANK_ATM_YN,
+		TRANSACTION_BRANCH_CODE, TELLER_CODE, TELLER_USER_ID, INTERFACE_CODE
+		FROM GTW_ATM_ACQUIRER
+		WHERE INTERFACE_CODE = #{interfaceCode}
+	</select>
+	
+	
+	<resultMap id="acqTrxListMap" type="transactionTypeCO">
+		<result column="ACQUIRER_ID" property="acquirerId" />
+		<result column="TRX_TYPE" property="trxType" />
+		<result column="TRX_EXPRESSION" property="expression" />
+
+		<!-- Map Collection of fees transactions types -->
+		<collection property="listOfFees" ofType="transactionTypeCO" notNullColumn="CHARGES_TRX_TYPE">
+			<result column="CHARGES_TRX_TYPE" property="trxType" />
+			<result column="CHARGES_TRX_EXPRESSION" property="expression" />
+			<result column="ACQUIRER_ID" property="acquirerId" />
+		</collection>
+
+	</resultMap>
+	
+	<!--  later on we may remove the null checking since expression is required -->
+	<select id="returnTrxTypeList" parameterType="acquirerSC" resultMap="acqTrxListMap">
+		SELECT TRX_TYPES.ACQUIRER_ID, TRX_TYPES.TRX_TYPE,
+			TRX_TYPES.TRX_EXPRESSION, TRX_FEES.CHARGES_TRX_TYPE, TRX_FEES.CHARGES_TRX_EXPRESSION FROM (
+			SELECT PG.ACQUIRER_ID, PG.TRX_TYPE, PG.TRX_EXPRESSION 
+			FROM GTW_ATM_ACQUIRER_TRX_TYPE PG
+			WHERE PG.ACQUIRER_ID = #{id}
+			GROUP BY PG.ACQUIRER_ID, PG.TRX_TYPE, PG.TRX_EXPRESSION
+			) TRX_TYPES
+		LEFT JOIN GTW_ATM_ACQUIRER_TRX_TYPE TRX_FEES
+		ON (TRX_TYPES.ACQUIRER_ID = TRX_FEES.ACQUIRER_ID
+		AND TRX_TYPES.TRX_TYPE = TRX_FEES.TRX_TYPE
+		<if test="isSybase == 1" >
+			AND ISNULL(TRX_TYPES.TRX_EXPRESSION,'') = ISNULL(TRX_FEES.TRX_EXPRESSION,'') )
+		</if>
+		<if test="isOracle == 1" >
+		  AND NVL(TRX_TYPES.TRX_EXPRESSION,'') = NVL(TRX_FEES.TRX_EXPRESSION,'') )       		
+		</if>
+		
+	
+	</select>
+	
+	<resultMap id="returnTerminalMap" type="terminalCO">
+		<result column="TERMINAL_CODE" property="code" />
+		<result column="COMP_CODE" property="compCode" />
+		<result column="DESCRIPTION" property="description" />
+		<result column="TERMINAL_ID" property="terminalId" />
+		<result column="TRANSACTION_BRANCH_CODE" property="trxBranchCode" />
+		<result column="TELLER_CODE" property="tellerCode" />
+		<result column="ADDRESS" property="address" />
+		<result column="TELEPHONE" property="telephone" />
+		<result column="EMAIL" property="email" />
+		<result column="EXPRESSION" property="expression" />
+		<result column="INTERFACE_CODE" property="interfaceCode" />
+		<result column="TELLER_USER_ID" property="tellerUserId" />
+		<result column="ACQUIRER_ID" property="acquirerId" />
+		<result column="MERCHANT_CODE" property="merchantCO.code" />
+		<result column="ADDITIONAL_REFERENCE" property="merchantCO.additionalRef" />
+		<result column="IBAN_ACC_NO" property="merchantCO.ibanAccNo" />
+	</resultMap>
+	
+	<select id="returnTerminals" resultMap="returnTerminalMap" parameterType="terminalSC">
+		SELECT TERMINAL.COMP_CODE, TERMINAL.TERMINAL_ID, TERMINAL.DESCRIPTION,
+		TERMINAL.MERCHANT_CODE, TERMINAL.TRANSACTION_BRANCH_CODE,TERMINAL.TELLER_CODE, TERMINAL.ADDRESS, TERMINAL.TELEPHONE,
+		TERMINAL.EMAIL, TERMINAL.TERMINAL_CODE, TERMINAL.EXPRESSION, TERMINAL.INTERFACE_CODE, TERMINAL.TELLER_USER_ID,
+		TERMINAL.ACQUIRER_ID, MERCHANT.ADDITIONAL_REFERENCE, MERCHANT.IBAN_ACC_NO
+		FROM GTW_ATM_TERMINAL TERMINAL
+		LEFT JOIN GTW_ATM_MERCHANT MERCHANT
+			ON MERCHANT.MERCHANT_CODE = TERMINAL.MERCHANT_CODE
+		<where>
+			<if test="interfaceCode != null">
+				AND INTERFACE_CODE = #{interfaceCode}
+			</if>
+			<if test="acquirerId != null">
+				AND ACQUIRER_ID = #{acquirerId}
+			</if>
+			<if test="code != null">
+				AND
+				<choose>
+					<when test="code.equals(&quot;&quot;)">
+						TERMINAL_CODE = NULL ,
+					</when>
+					<otherwise>
+						TERMINAL_CODE = #{code},
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+	</select>
+	
+	<resultMap id="returnISOResponseMappingMap" type="atmIsoResponseMapCO">
+		<result column="GTW_ATM_ISO_RESPONSE_MAP_ID" property="atmIsoResponseMapId" />
+		<result column="RESPONSE_TYPE" property="responseType" />
+		<result column="CORE_STATUS_CODE" property="coreStatusCode" />
+		<result column="ISO_RESPONSE_CODE" property="isoStatusCode" />
+	</resultMap>
+
+
+	<select id="returnIsoResponseMappingList" resultMap="returnISOResponseMappingMap" 
+		parameterType="interfaceConfSc">
+		SELECT GTW_ATM_ISO_RESPONSE_MAP_ID, RESPONSE_TYPE, CORE_STATUS_CODE, ISO_RESPONSE_CODE
+		FROM GTW_ATM_ISO_RESPONSE_MAP
+		WHERE INTERFACE_CODE = #{code}
+	</select>
+	
+</mapper>

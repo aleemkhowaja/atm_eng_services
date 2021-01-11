@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	<bean name="atmEngBOService" factory-bean="atmEngServicesExporter" factory-method="export" >
+		<constructor-arg name="serviceName" value="atmEngBOService" />
+		<constructor-arg name="service" ref="atmEngBO" />
+		<constructor-arg name="serviceInterface" value="com.path.atm.bo.engine.AtmEngineBO" />		
+	</bean>
+	
+	<bean name="atmEngConfigBOService" factory-bean="atmEngServicesExporter" factory-method="export" >
+		<constructor-arg name="serviceName" value="atmEngConfigBOService" />
+		<constructor-arg name="service" ref="atmEngConfigBO" />
+		<constructor-arg name="serviceInterface" value="com.path.atm.bo.engine.AtmEngineConfigBO" />		
+	</bean>
+	
+	<bean name="atmEngineLogsBOService" factory-bean="atmEngServicesExporter" factory-method="export" >
+		<constructor-arg name="serviceName" value="atmEngineLogsBOService" />
+		<constructor-arg name="service" ref="atmEngineLogsBO" />
+		<constructor-arg name="serviceInterface" value="com.path.atm.bo.engine.AtmEngineLogsBO" />		
+	</bean>
+	
+	
+</beans>

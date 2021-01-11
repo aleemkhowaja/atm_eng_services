@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="com/path/atm/engine/connector/client/ClientConfiguration.java|com/path/atm/engine/connector/client/ClientConnector.java|com/path/atm/engine/pool/tasks/OrderedRunnableTask.java|com/path/atm/engine/pool/DefaultEvictionPolicy.java|com/path/atm/engine/pool/EvictionTimer.java" kind="src" path="src"/>
+	<classpathentry kind="src" path="reporting_services_common_src"/>
+	<classpathentry kind="src" path="reporting_services_common_resources"/>
+	<classpathentry kind="src" path="service_client_common_resources_business"/>
+	<classpathentry kind="src" path="services_common_business"/>
+	<classpathentry kind="src" path="service_client_common_src_business"/>
+	<classpathentry kind="src" path="service_client_common_src"/>
+	<classpathentry kind="src" path="services_common"/>
+	<classpathentry kind="src" path="service_client_common_resources"/>
+	<classpathentry kind="src" path="library_src"/>
+	<classpathentry kind="src" path="resources_atm_eng_services"/>
+	<classpathentry kind="src" path="atm_engine_services_common_src"/>
+	<classpathentry kind="src" path="atm_engine_services_common_resources"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/custom_libs">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-11">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/ATM Engine">
+		<attributes>
+			<attribute name="owner.project.facets" value="#system#;jst.web"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

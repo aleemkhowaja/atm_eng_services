@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="atm_eng_services">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/reporting_services_common_src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/reporting_services_common_resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/service_client_common_resources_business"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/services_common_business"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/service_client_common_src_business"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/service_client_common_src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/services_common"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/service_client_common_resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/library_src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources_atm_eng_services"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/atm_engine_services_common_src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/atm_engine_services_common_resources"/>
+        <property name="context-root" value="atm_eng_services"/>
+        <property name="java-output-path" value="/atm_eng_services/build/classes"/>
+    </wb-module>
+</project-modules>

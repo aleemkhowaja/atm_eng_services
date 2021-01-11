@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<!--  init-method="start" destroy-method="shutdown" -->
+	<bean id="atmEngBO" factory-bean="atmEngServiceBeanFactory"
+		factory-method="getInstance" parent="baseBO" init-method="start" destroy-method="shutdown">
+		<constructor-arg name="implClassName"
+			value="com.path.atm.bo.engine.impl.AtmEngineBOImpl" />
+		<constructor-arg name="interfaceName"
+			value="com.path.atm.bo.engine.AtmEngineBO" />
+		<constructor-arg name="remoteServiceName" value="atmEngBOService" />
+		<property name="atmEngineDAO" ref="atmEngineDAO"></property>
+	</bean>
+	
+	
+	<bean id="atmEngConfigBO" factory-bean="atmEngServiceBeanFactory"
+		factory-method="getInstance" parent="baseBO">
+		<constructor-arg name="implClassName"
+			value="com.path.atm.bo.engine.impl.AtmEngineConfigBOImpl" />
+		<constructor-arg name="interfaceName"
+			value="com.path.atm.bo.engine.AtmEngineConfigBO" />
+		<constructor-arg name="remoteServiceName" value="atmEngConfigBOService" />
+		<property name="atmEngConfigDAO" ref="atmEngConfigDAO"></property>
+	</bean>
+
+	<bean id="atmEngineLogsBO" factory-bean="atmEngServiceBeanFactory" factory-method="getInstance" parent="baseBO">
+		<constructor-arg name="implClassName" value="com.path.atm.bo.engine.impl.AtmEngineLogsBOImpl" />
+		<constructor-arg name="interfaceName" value="com.path.atm.bo.engine.AtmEngineLogsBO" />
+		<constructor-arg name="remoteServiceName" value="atmEngineLogsBOService" />
+		<property name="atmEngineLogsDAO" ref="atmEngineLogsDAO"></property>
+	</bean>
+</beans>

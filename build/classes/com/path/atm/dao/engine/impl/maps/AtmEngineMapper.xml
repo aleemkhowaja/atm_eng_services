@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="atmEngineMapper">
+
+	
+	<resultMap type="hashmap" id="resultConfigMap">
+		<result property="CTRL_REFERENCE" column="CTRL_REFERENCE" javaType="string" />
+		<result property="CTRL_VALUE" column="CTRL_VALUE" javaType="bigdecimal"/>
+	</resultMap>
+
+	<select id="returnAlertConfig" resultMap="resultConfigMap" >
+		SELECT *
+		FROM ALRT_CONTROL
+	</select>
+	
+</mapper>
